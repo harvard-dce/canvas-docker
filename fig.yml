@@ -4,3 +4,13 @@ canvas:
         - "3000:80"
     expose:
         - "80"
+
+redis:
+    image: redis
+    expose:
+        - "6379"
+
+pg:
+    image: postgres
+    expose:
+        - "5432"

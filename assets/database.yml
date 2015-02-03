@@ -1,0 +1,46 @@
+# do not create a queue: section for your test environment
+test:
+  adapter: postgresql
+  encoding: utf8
+  database: canvas_test
+  host: localhost
+  username: canvas
+  timeout: 5000
+
+development:
+  adapter: postgresql
+  encoding: utf8
+  database: canvas_production
+  host: <%= ENV['DB_PORT_5432_TCP_ADDR'] %>
+  port: <%= ENV['DB_PORT_5432_TCP_PORT'] %>
+  username: canvas
+  password: <%= ENV['DBPASS'] %>
+  timeout: 5000
+  queue:
+    adapter: postgresql
+    encoding: utf8
+    database: canvas_queue_production
+    host: <%= ENV['DB_PORT_5432_TCP_ADDR'] %>
+    port: <%= ENV['DB_PORT_5432_TCP_PORT'] %>
+    username: canvas
+    password: <%= ENV['DBPASS'] %>
+    timeout: 5000
+    
+production:
+  adapter: postgresql
+  encoding: utf8
+  database: canvas_production
+  host: <%= ENV['DB_PORT_5432_TCP_ADDR'] %>
+  port: <%= ENV['DB_PORT_5432_TCP_PORT'] %>
+  username: canvas
+  password: <%= ENV['DBPASS'] %>
+  timeout: 5000
+  queue:
+    adapter: postgresql
+    encoding: utf8
+    database: canvas_queue_production
+    host: <%= ENV['DB_PORT_5432_TCP_ADDR'] %>
+    port: <%= ENV['DB_PORT_5432_TCP_PORT'] %>
+    username: canvas
+    password: <%= ENV['DBPASS'] %>
+    timeout: 5000
