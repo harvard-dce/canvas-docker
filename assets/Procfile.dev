@@ -1,0 +1,3 @@
+dbinit: bundle exec rake db:initial_setup
+#web: bundle exec rails server
+#worker: bundle exec script/delayed_job run

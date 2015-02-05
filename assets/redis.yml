@@ -8,7 +8,7 @@
 production:
   servers:
     # list of redis servers to use in the ring
-    - "redis://<%= ENV['CACHE_PORT_6379_TCP_ADDR'] %>:<%= ENV['CACHE_PORT_6379_TCP_PORT'] %>"
+    - "redis://<%= ENV['REDIS_PORT_6379_TCP_ADDR'] %>:<%= ENV['REDIS_PORT_6379_TCP_PORT'] %>"
 
 test:
   # only tests that are exercising the integration with redis require redis to run.
@@ -22,5 +22,5 @@ test:
 development:
   servers:
     # list of redis servers to use in the ring
-    - "redis://<%= ENV['CACHE_PORT_6379_TCP_ADDR'] %>:<%= ENV['CACHE_PORT_6379_TCP_PORT'] %>"
+    - "redis://<%= ENV['REDIS_PORT_6379_TCP_ADDR'] %>:<%= ENV['REDIS_PORT_6379_TCP_PORT'] %>"
 

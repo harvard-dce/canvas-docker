@@ -20,7 +20,7 @@ RUN apt-get -y install ruby1.9.3 \
 
 ENV DEBIAN_FRONTEND newt
 
-RUN gem install bundler --version 1.7.2
+RUN gem install bundler --version 1.7.10
 
 # Set the locale to avoid active_model_serializers bundler install failure
 RUN locale-gen en_US.UTF-8
@@ -41,5 +41,20 @@ RUN cd /opt/canvas-lms \
        ; done
 ADD assets/database.yml /opt/canvas-lms/config/database.yml
 ADD assets/redis.yml /opt/canvas-lms/config/redis.yml
+ADD assets/Procfile.dev /opt/canvas-lms/Procfile.dev
 
-CMD ["bin/bash"]
+RUN gem install foreman
+
+RUN apt-get -y install postgresql-client
+
+RUN cd /opt/canvas-lms \
+    &&  npm install --unsafe-perm \
+    && bundle exec rake canvas:compile_assets
+
+ENV CANVAS_LMS_ADMIN_EMAIL canvas@example.edu
+ENV CANVAS_LMS_ADMIN_PASSWORD canvas
+ENV CANVAS_LMS_ACCOUNT_NAME Canvas Dev
+ENV CANVAS_LMS_STATS_COLLECTION opt_out
+
+WORKDIR /opt/canvas-lms
+CMD ["foreman", "start", "-f", "Procfile.dev"]

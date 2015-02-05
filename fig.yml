@@ -1,9 +1,13 @@
 canvas:
     build: .
+    command: /bin/sh
     ports:
         - "3000:80"
     expose:
         - "80"
+    links:
+        - redis
+        - pg
 
 redis:
     image: redis
@@ -11,6 +15,6 @@ redis:
         - "6379"
 
 pg:
-    image: postgres
+    build: ./postgres
     expose:
         - "5432"
