@@ -55,3 +55,6 @@ target/
 
 # PyCharm
 .idea/
+
+# fig config
+fig.yml

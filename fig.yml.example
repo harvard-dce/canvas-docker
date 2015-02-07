@@ -1,10 +1,9 @@
 canvas:
     build: .
-    command: /bin/sh
     ports:
-        - "3000:80"
+        - "3000:3000"
     expose:
-        - "80"
+        - "3000"
     links:
         - redis
         - pg
@@ -18,3 +17,5 @@ pg:
     build: ./postgres
     expose:
         - "5432"
+    environment:
+        - POSTGRES_PASSWORD=mysecretpassword

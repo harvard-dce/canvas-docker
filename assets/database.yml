@@ -13,7 +13,7 @@ development:
   database: canvas_development
   host: <%= ENV['PG_PORT_5432_TCP_ADDR'] %>
   port: <%= ENV['PG_PORT_5432_TCP_PORT'] %>
-  username: canvas
+  username: postgres
   password: <%= ENV['DBPASS'] %>
   timeout: 5000
   queue:
@@ -22,7 +22,7 @@ development:
     database: canvas_queue_development
     host: <%= ENV['PG_PORT_5432_TCP_ADDR'] %>
     port: <%= ENV['PG_PORT_5432_TCP_PORT'] %>
-    username: canvas
+    username: postgres
     password: <%= ENV['DBPASS'] %>
     timeout: 5000
     
