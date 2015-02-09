@@ -7,6 +7,12 @@ canvas:
     links:
         - redis
         - pg
+    environment:
+        DBPASS: mysecretpassword
+        CANVAS_LMS_ADMIN_EMAIL: canvas@example.edu
+        CANVAS_LMS_ADMIN_PASSWORD: canvas
+        CANVAS_LMS_ACCOUNT_NAME: Canvas Dev
+        CANVAS_LMS_STATS_COLLECTION: opt_out
 
 redis:
     image: redis

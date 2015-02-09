@@ -15,9 +15,24 @@ This project aims to provide a simple, containerized Canvas instance running sep
 2. Why would you not create and activate a virtualenv?
 3. `pip install -r requirements.txt`
 4. `cp fig.yml.example fig.yml`
-5. Edit fig.yml and change the default postgres password if desired. You need to change both **DBPASS** in the *canvas:* section and **POSTGRES_PASSWORD** in the *pg:* section.
-6. `fig up`
-7. Point your browser to http://localhost:3000. The admin user/pass login is `canvas@example.edu` / `canvas`.
+5. `fig up`
+6. Point your browser to [http://localhost:3000](http://localhost:3000). The default admin user/pass login is `canvas@example.edu` / `canvas`.
+
+## Tweaks
+
+There are a few tweaks that can be made by editing `fig.yml`:
+
+### Postgres password
+
+The default is *mysecretpassword*. For something different you need to change both **DBPASS** in the *canvas:* section and **POSTGRES_PASSWORD** in the *pg:* section.
+
+### Host port
+
+To map a different host port to the canvas container in the *canvas:* section of `fig.yml` change `"3000:3000"` to, e.g., `"8080:3000"`
+
+### Canvas admin user
+
+You can modify the defaults for the canvas admin user by editing the environment settings of the *canvas:* section of `fig.yml`.
 
 ## Contributors
 

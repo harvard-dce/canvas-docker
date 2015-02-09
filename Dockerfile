@@ -52,9 +52,4 @@ RUN cd /opt/canvas-lms \
     &&  npm install --unsafe-perm \
     && bundle exec rake canvas:compile_assets
 
-ENV CANVAS_LMS_ADMIN_EMAIL canvas@example.edu
-ENV CANVAS_LMS_ADMIN_PASSWORD canvas
-ENV CANVAS_LMS_ACCOUNT_NAME Canvas Dev
-ENV CANVAS_LMS_STATS_COLLECTION opt_out
-
 CMD /opt/canvas-lms/run.sh
