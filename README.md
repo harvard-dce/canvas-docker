@@ -9,30 +9,22 @@ This project aims to provide a simple, containerized Canvas instance running sep
 * [docker](https://www.docker.com/) (developed & tested w/ v1.4.1)
 * [fig](http://fig.sh) (requires python >= 2.7, docker >= 1.3)
 
-## Getting Started
+## Quick Start
 
 1. Clone this repo somewhere. 
 2. Why would you not create and activate a virtualenv?
 3. `pip install -r requirements.txt`
-4. `cp fig.yml.example fig.yml`
+4. Copy one of either `fig.yml.standard` or `fig.yml.fat` to `fig.yml`
 5. `fig up`
 6. Point your browser to [http://localhost:3000](http://localhost:3000). The default admin user/pass login is `canvas@example.edu` / `canvas`.
 
+## Fat vs Standard
+
+This project contains Dockerfiles, scripts and `fig` configurations for building either a "standard", multi-container instance, or a "fat" image where all components are run in a single container. Both should work interchangeably for the purposes of running a dev/test instance of canvas. The "fat" image has the advantage of being much faster to spin up as the canvas database init rake tasks have already been run during the image build. The "standard" approach, OTOH, adheres to the general Docker philosophy of one responsibility/service per container. Which one is better?  ¯\\_(ツ)_/¯
+
 ## Tweaks
 
-There are a few tweaks that can be made by editing `fig.yml`:
-
-### Postgres password
-
-The default is *mysecretpassword*. For something different you need to change both **DBPASS** in the *canvas:* section and **POSTGRES_PASSWORD** in the *pg:* section.
-
-### Host port
-
-To map a different host port to the canvas container in the *canvas:* section of `fig.yml` change `"3000:3000"` to, e.g., `"8080:3000"`
-
-### Canvas admin user
-
-You can modify the defaults for the canvas admin user by editing the environment settings of the *canvas:* section of `fig.yml`.
+See the `environment:` section of the respective `fig.yml.*` files for configurable settings. 
 
 ## Contributors
 
