@@ -1,0 +1,19 @@
+canvas:
+    build: .
+    ports:
+        - "3000:3000"
+        # Uncomment to map postgres and/or redis ports
+        # - "5432:5432"
+        # - "6379:6379"
+    expose:
+        - "3000"
+    # Uncomment if you need to alter the defaults
+    # environment:
+        # RAILS_ENV: "development"
+        # DBUSER: "canvas"
+        # DBPASS: "canvas"
+        # POSTGRESQL_DATA: "/path/to/your/data/volume"
+        # CANVAS_LMS_ADMIN_EMAIL: "canvas@example.edu"
+        # CANVAS_LMS_ADMIN_PASSWORD: "canvas"
+        # CANVAS_LMS_ACCOUNT_NAME: "Canvas Dev"
+        # CANVAS_LMS_STATS_COLLECTION: "opt_out"
