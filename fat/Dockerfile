@@ -39,7 +39,7 @@ ENV LC_ALL en_US.UTF-8
 RUN cd /opt \
     && git clone https://github.com/instructure/canvas-lms.git \
     && cd /opt/canvas-lms \
-    && bundle install --path vendor/bundle --without=sqlite mysql
+    && bundle install --path vendor/bundle --without="sqlite mysql development_and_test"
 
 # config setup
 RUN cd /opt/canvas-lms \
