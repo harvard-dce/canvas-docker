@@ -1,5 +1,5 @@
 canvas:
-    build: .
+    build: ./fat
     ports:
         - "3000:3000"
         # Uncomment to map postgres and/or redis ports

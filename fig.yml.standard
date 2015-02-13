@@ -1,5 +1,5 @@
 canvas:
-    build: .
+    build: ./standard
     ports:
         - "3000:3000"
     expose:
@@ -20,7 +20,7 @@ redis:
         - "6379"
 
 pg:
-    build: ./postgres
+    build: ./standard/postgres
     expose:
         - "5432"
     environment:
