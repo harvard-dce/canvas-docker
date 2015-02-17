@@ -15,7 +15,7 @@ canvas:
         CANVAS_LMS_STATS_COLLECTION: opt_out
 
 redis:
-    image: redis
+    image: redis:latest
     expose:
         - "6379"
 
