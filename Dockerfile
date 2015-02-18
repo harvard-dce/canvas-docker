@@ -2,8 +2,8 @@ FROM ubuntu:14.04
 
 MAINTAINER Jay Luker <jay_luker@harvard.edu>
 
-ENV DEBIAN_FRONTEND noninteractive
 ENV POSTGRES_VERSION 9.3
+ENV RAILS_ENV development
 
 # add nodejs and recommended ruby repos
 RUN apt-get update \
@@ -16,7 +16,7 @@ RUN apt-get update \
 RUN apt-get install -y \
     ruby1.9.3  zlib1g-dev libxml2-dev libxslt1-dev \
     imagemagick libpq-dev libxmlsec1-dev libcurl4-gnutls-dev \
-    libxmlsec1 build-essential openjdk-7-jre unzip \
+    libxmlsec1 build-essential openjdk-7-jre unzip curl \
     python g++ make git-core nodejs supervisor redis-server \
     libpq5 \
     postgresql-$POSTGRES_VERSION \
@@ -24,8 +24,6 @@ RUN apt-get install -y \
     postgresql-contrib-$POSTGRES_VERSION \
     && apt-get clean \
     && rm -Rf /var/cache/apt
-
-ENV DEBIAN_FRONTEND dialog
 
 RUN gem install bundler --version 1.7.10
 
@@ -39,7 +37,8 @@ ENV LC_ALL en_US.UTF-8
 RUN cd /opt \
     && git clone https://github.com/instructure/canvas-lms.git \
     && cd /opt/canvas-lms \
-    && bundle install --path vendor/bundle --without="sqlite mysql development_and_test"
+    && curl https://github.com/ccutrer/canvas-lms/commit/a44c84ec9bb6aef21416208372fa3ca00ece4b77.patch | git apply \
+    && bundle install --path vendor/bundle --without="sqlite mysql"
 
 # config setup
 RUN cd /opt/canvas-lms \
@@ -53,13 +52,14 @@ RUN cd /opt/canvas-lms \
 
 COPY assets/database.yml /opt/canvas-lms/config/database.yml
 COPY assets/redis.yml /opt/canvas-lms/config/redis.yml
+COPY assets/cache_store.yml /opt/canvas-lms/config/cache_store.yml
+COPY assets/development-local.rb /opt/canvas-lms/config/environments/development-local.rb
 COPY assets/supervisord.conf /etc/supervisor/supervisord.conf
-COPY assets/setenv.sh /setenv.sh
 COPY assets/dbinit.sh /dbinit.sh
-RUN chmod 755 /dbinit.sh /setenv.sh
+COPY assets/dbconf.sh /dbconf.sh
+RUN chmod 755 /dbconf.sh /dbinit.sh
 
-RUN sed -i -e 's/local\s\+all\s\+all\s\+peer/local all all md5/g' /etc/postgresql/$POSTGRES_VERSION/main/pg_hba.conf
-RUN service postgresql start && /dbinit.sh
+RUN /dbconf.sh && service postgresql start && /dbinit.sh
 
 # postgres
 EXPOSE 5432
@@ -68,5 +68,4 @@ EXPOSE 6379
 # canvas
 EXPOSE 3000
 
-ENTRYPOINT ["/setenv.sh"]
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

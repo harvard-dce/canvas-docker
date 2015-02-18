@@ -1,0 +1,20 @@
+test:
+  adapter: postgresql
+  encoding: utf8
+  database: canvas_test
+  host: localhost
+  username: postgres
+  timeout: 5000
+
+login: &login
+  adapter: postgresql
+  encoding: utf8
+  timeout: 5000
+  username: "canvas"
+
+development:
+  <<: *login
+  database: canvas_development
+  queue:
+    <<: *login
+    database: canvas_queue_development

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project aims to provide a simple, containerized Canvas instance running separate, networked containers for canvas, postgres and redis. The initial container provisioning via the Dockerfile follows the Canvas "Production Start". However, it was created for the purposes of developing and testing LTI applications, not for running a production Canvas.
+**docker-canvas** aims to provide a simple, disposable, containerized Canvas instance for fast(ish) integration testing of LTI applications.
 
 ## Prerequisites
 
@@ -14,17 +14,25 @@ This project aims to provide a simple, containerized Canvas instance running sep
 1. Clone this repo somewhere. 
 2. Why would you not create and activate a virtualenv?
 3. `pip install -r requirements.txt`
-4. Copy one of either `fig.yml.standard` or `fig.yml.fat` to `fig.yml`
-5. `fig up`
-6. Point your browser to [http://localhost:3000](http://localhost:3000). The default admin user/pass login is `canvas@example.edu` / `canvas`.
+4. Build the image: `docker build -t canvas-docker .`
+5. Start the container: `docker run -t -i -p 3000 --name canvas-docker canvas-docker`
+6. Point your browser to [http://localhost:3000](http://localhost:3000). The admin user/pass login is `canvas@example.edu` / `canvas`.
 
-## Fat vs Standard
+## The "fat" container
 
-This project contains Dockerfiles, scripts and `fig` configurations for building either a "standard", multi-container instance, or a "fat" image where all components are run in a single container. Both should work interchangeably for the purposes of running a dev/test instance of canvas. The "fat" image has the advantage of being much faster to spin up as the canvas database init rake tasks have already been run during the image build. The "standard" approach, OTOH, adheres to the general Docker philosophy of one responsibility/service per container. Which one is better?  ¯\\_(ツ)_/¯
+The `Dockerfile` and associated build scripts create a resulting docker image where all necessary services of the Canvas instance are run within a single container. This approach is sometimes called a "fat" container. This admittedly goes against the "Docker Philosophy" of *one concern per container*, but for the intended purposes of the image it offers a couple of advantages, chief among them, faster spin-up times. The functionality focus is on creating a tool for integration testing of external (LTI) apps, not general canvas development, scalability, or, god forbid, actual deployment.
 
-## Tweaks
+## Details
 
-See the `environment:` section of the respective `fig.yml.*` files for configurable settings. 
+* The resulting canvas image is built and run using `RAILS_ENV=development`. At some point I might try creating a separate "production" flavor, but, because docker doesn't allow the setting of build-time variables except in the `Dockerfile`, it would require a separate `Dockerfile`. Also, when I did try building with `RAILS_ENV=production`, the resulting instance had issues with routing errors to the compiled assets, and the `db:initial_setup` rake task threw lots of warnings about missing triggers (?). So that.
+* Everything is currently somewhat "opinionated" in that things that would be nice to have configurable are hard-coded, e.g., postgres and canvas usernames, postgres network settings, path to the postgres data, etc.
+* The `Dockerfile` process mostly follows Canvas's [Quick Start](https://github.com/instructure/canvas-lms/wiki/Quick-Start) guidelines with a few exeptions:
+    * as mentioned above, `RAILS_ENV=development`
+    * redis is installed, configured and used
+    * the `delated_job` background task is executed
+    * postgres is configured to not require a password for local connections, or for connections originating within a network defined by Docker's default network bridge setup: 172.17.0.0/16.
+    * everything is executed as root. This is me being lazy and I hope to fix this by creating/using a `canvas` user at some point.
+* 
 
 ## Contributors
 
