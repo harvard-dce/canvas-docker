@@ -6,17 +6,18 @@
 
 ## Prerequisites
 
-* [docker](https://www.docker.com/) (developed & tested w/ v1.4.1)
-* [fig](http://fig.sh) (requires python >= 2.7, docker >= 1.3)
+* [docker](https://www.docker.com/) (developed & tested w/ v1.5.0)
 
-## Quick Start
+## Building
 
 1. Clone this repo somewhere. 
-2. Why would you not create and activate a virtualenv?
-3. `pip install -r requirements.txt`
-4. Build the image: `docker build -t canvas-docker .`
-5. Start the container: `docker run -t -i -p 3000 --name canvas-docker canvas-docker`
-6. Point your browser to [http://localhost:3000](http://localhost:3000). The admin user/pass login is `canvas@example.edu` / `canvas`.
+2. Build the image: `docker build -t canvas-docker .`
+3. Start the container: `docker run -t -i -p 3000 --name canvas-docker canvas-docker`
+4. Point your browser to [http://localhost:3000](http://localhost:3000). The admin user/pass login is `canvas@example.edu` / `canvas`.
+
+## Docker Hub image
+
+This repo is [registered](https://registry.hub.docker.com/u/lbjay/canvas-docker/) at Docker Hub as an automated build. So you should also be able to `docker pull lbjay/canvas-docker` to get the pre-built image.
 
 ## The "fat" container
 
@@ -32,7 +33,6 @@ The `Dockerfile` and associated build scripts create a resulting docker image wh
     * the `delated_job` background task is executed
     * postgres is configured to not require a password for local connections, or for connections originating within a network defined by Docker's default network bridge setup: 172.17.0.0/16.
     * everything is executed as root. This is me being lazy and I hope to fix this by creating/using a `canvas` user at some point.
-* 
 
 ## Contributors
 

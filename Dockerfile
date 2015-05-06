@@ -18,7 +18,7 @@ RUN apt-get install -y \
     imagemagick libpq-dev libxmlsec1-dev libcurl4-gnutls-dev \
     libxmlsec1 build-essential openjdk-7-jre unzip curl \
     python g++ make git-core nodejs supervisor redis-server \
-    libpq5 \
+    libpq5 libsqlite3-dev \
     postgresql-$POSTGRES_VERSION \
     postgresql-client-$POSTGRES_VERSION \
     postgresql-contrib-$POSTGRES_VERSION \
@@ -37,8 +37,7 @@ ENV LC_ALL en_US.UTF-8
 RUN cd /opt \
     && git clone https://github.com/instructure/canvas-lms.git \
     && cd /opt/canvas-lms \
-    && curl https://github.com/ccutrer/canvas-lms/commit/a44c84ec9bb6aef21416208372fa3ca00ece4b77.patch | git apply \
-    && bundle install --path vendor/bundle --without="sqlite mysql"
+    && bundle install --path vendor/bundle --without="mysql"
 
 # config setup
 RUN cd /opt/canvas-lms \
