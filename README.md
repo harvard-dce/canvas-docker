@@ -12,7 +12,7 @@
 
 1. Clone this repo somewhere. 
 2. Build the image: `docker build -t canvas-docker .`
-3. Start the container: `docker run -t -i -p 3000 --name canvas-docker canvas-docker`
+3. Start the container: `docker run -t -i -p 3000:3000 --name canvas-docker canvas-docker`
 4. Point your browser to [http://localhost:3000](http://localhost:3000). The admin user/pass login is `canvas@example.edu` / `canvas`.
 
 ## Docker Hub image
@@ -22,6 +22,19 @@ This repo is [registered](https://registry.hub.docker.com/u/lbjay/canvas-docker/
 ## The "fat" container
 
 The `Dockerfile` and associated build scripts create a resulting docker image where all necessary services of the Canvas instance are run within a single container. This approach is sometimes called a "fat" container. This admittedly goes against the "Docker Philosophy" of *one concern per container*, but for the intended purposes of the image it offers a couple of advantages, chief among them, faster spin-up times. The functionality focus is on creating a tool for integration testing of external (LTI) apps, not general canvas development, scalability, or, god forbid, actual deployment.
+
+## Default developer_key & API access token
+
+The image build includes the injection of default `developer_key` and `access_token` entries into the database. 
+
+* **developer key**: test_developer_key
+* **access token**: canvas-docker
+
+API requests should be possible, e.g.,
+
+`curl -H "Authorization: Bearer canvas-docker" http://localhost:3000/api/v1/courses`
+
+The developer key is for use with Canvas's [OAuth2 Token Request Flow](https://canvas.instructure.com/doc/api/file.oauth.html)
 
 ## Details
 
