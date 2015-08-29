@@ -1,0 +1,2 @@
+deb https://deb.nodesource.com/node_0.12 trusty main
+deb-src https://deb.nodesource.com/node_0.12 trusty main
