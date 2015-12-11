@@ -19,15 +19,18 @@ RUN apt-get update \
     && apt-get update
 
 # install deps for building/running canvas
+RUN echo "postfix postfix/mailname string localhost" |debconf-set-selections
+RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" |debconf-set-selections
 RUN apt-get install -y \
     ruby2.1 ruby2.1-dev zlib1g-dev libxml2-dev libxslt1-dev \
     imagemagick libpq-dev libxmlsec1-dev libcurl4-gnutls-dev \
     libxmlsec1 build-essential openjdk-7-jre unzip curl \
     python g++ make git-core nodejs supervisor redis-server \
-    libpq5 libsqlite3-dev \
+    libpq5 libsqlite3-dev mailutils \
     postgresql-$POSTGRES_VERSION \
     postgresql-client-$POSTGRES_VERSION \
     postgresql-contrib-$POSTGRES_VERSION \
+    && echo 'myhostname = localhost' >> /etc/postfix/main.cf \
     && apt-get clean \
     && rm -Rf /var/cache/apt
 
@@ -57,6 +60,7 @@ RUN cd /opt/canvas-lms \
 
 COPY assets/database.yml /opt/canvas-lms/config/database.yml
 COPY assets/redis.yml /opt/canvas-lms/config/redis.yml
+COPY assets/outgoing_mail.yml /opt/canvas-lms/config/outgoing_mail.yml
 COPY assets/cache_store.yml /opt/canvas-lms/config/cache_store.yml
 COPY assets/development-local.rb /opt/canvas-lms/config/environments/development-local.rb
 COPY assets/supervisord.conf /etc/supervisor/supervisord.conf
