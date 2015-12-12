@@ -1,0 +1,38 @@
+development:
+  address: "localhost"
+  port: "25"
+  domain: "localhost"
+  outgoing_address: "canvas@example.com"
+  default_name: "Instructure Canvas"
+  openssl_verify_mode: "none"
+
+# or to use sendmail --
+#
+# development:
+#   delivery_method: "sendmail"
+
+production:
+  address: "localhost"
+  port: "25"
+  domain: "localhost"
+  outgoing_address: "canvas@example.com"
+  default_name: "Instructure Canvas"
+  openssl_verify_mode: "none"
+
+# If receiving mail from multiple inboxes (see incoming_mail.yml.example),
+# you'll want to include those addresses in a reply_to_addresses array so
+# Canvas will select the Reply-To field of outgoing messages from all of the
+# incoming mailboxes.
+
+multiple_inboxes:
+  address: "localhost"
+  port: "25"
+  domain: "localhost"
+  outgoing_address: "canvas@example.com"
+  default_name: "Instructure Canvas"
+  openssl_verify_mode: "none"
+  reply_to_addresses:
+  - "canvas1@example.com"
+  - "canvas2@example.com"
+  - "canvas3@example.com"
+  - "canvas4@example.com"
