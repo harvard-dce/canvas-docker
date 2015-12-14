@@ -36,6 +36,25 @@ API requests should be possible, e.g.,
 
 The developer key is for use with Canvas's [OAuth2 Token Request Flow](https://canvas.instructure.com/doc/api/file.oauth.html)
 
+## Outgoing Email
+
+By default the instance's outgoing email `delivery_method` will be set to "test", meaning outgoing emails, such as user registration messages, will be 
+sent to the container's stdout. 
+
+To configure 'smtp' delivery set the following $ENV values at runtime:
+
+* **EMAIL_DELIVERY_METHOD** (set this to "smtp")
+* **SMTP_ADDRESS**
+* **SMTP_PORT**
+* **SMTP_USER**
+* **SMTP_PASS**
+
+Example using [Mandrill](https://mandrillapp.com/):
+
+```
+docker run -d --name=canvas -p 3000:3000 -e EMAIL_DELIVERY_METHOD=smtp -e SMTP_ADDRESS=smtp.mandrillapp.com -e SMTP_PORT=587 -e SMTP_USER=<mandrill_user> -e SMTP_PASS=<mandrill_api_key> lbjay/canvas-docker
+```
+
 ## Details
 
 * The resulting canvas image is built and run using `RAILS_ENV=development`. At some point I might try creating a separate "production" flavor, but, because docker doesn't allow the setting of build-time variables except in the `Dockerfile`, it would require a separate `Dockerfile`. Also, when I did try building with `RAILS_ENV=production`, the resulting instance had issues with routing errors to the compiled assets, and the `db:initial_setup` rake task threw lots of warnings about missing triggers (?). So that.
