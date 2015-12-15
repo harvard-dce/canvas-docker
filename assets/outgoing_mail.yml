@@ -1,0 +1,10 @@
+development:
+  delivery_method: "EMAIL_DELIVERY_METHOD"
+  address: "SMTP_ADDRESS"
+  port: "SMTP_PORT"
+  user_name: "SMTP_USER"
+  password: "SMTP_PASS"
+  domain: "example.edu"
+  outgoing_address: "canvas@example.edu"
+  default_name: "Instructure Canvas"
+  openssl_verify_mode: "none"

@@ -59,6 +59,7 @@ COPY assets/database.yml /opt/canvas-lms/config/database.yml
 COPY assets/redis.yml /opt/canvas-lms/config/redis.yml
 COPY assets/cache_store.yml /opt/canvas-lms/config/cache_store.yml
 COPY assets/development-local.rb /opt/canvas-lms/config/environments/development-local.rb
+COPY assets/outgoing_mail.yml /opt/canvas-lms/config/outgoing_mail.yml
 COPY assets/supervisord.conf /etc/supervisor/supervisord.conf
 COPY assets/dbinit.sh /dbinit.sh
 COPY assets/dbconf.sh /dbconf.sh
@@ -73,4 +74,6 @@ EXPOSE 6379
 # canvas
 EXPOSE 3000
 
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+COPY assets/start.sh /start.sh
+
+CMD ["/start.sh"]
