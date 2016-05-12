@@ -5,18 +5,13 @@ MAINTAINER Jay Luker <jay_luker@harvard.edu>
 ENV POSTGRES_VERSION 9.3
 ENV RAILS_ENV development
 
-# enable https repos and add in nodesource repo
-RUN apt-get -y install apt-transport-https
-COPY assets/nodesource.list /etc/apt/sources.list.d/nodesource.list
-ADD https://deb.nodesource.com/gpgkey/nodesource.gpg.key /tmp/nodesource.gpg.key
-RUN apt-key add /tmp/nodesource.gpg.key
-
 # add nodejs and recommended ruby repos
 RUN apt-get update \
-    && apt-get -y install software-properties-common python-software-properties \
+    && apt-get -y install curl software-properties-common \
     && add-apt-repository ppa:brightbox/ppa \
     && add-apt-repository ppa:brightbox/ruby-ng \
     && apt-get update
+RUN curl -sL https://deb.nodesource.com/setup_0.12 | bash
 
 # install deps for building/running canvas
 RUN apt-get install -y \
@@ -31,7 +26,7 @@ RUN apt-get install -y \
     && apt-get clean \
     && rm -Rf /var/cache/apt
 
-RUN gem install bundler --version 1.10.3
+RUN gem install bundler --version 1.11.2
 
 # Set the locale to avoid active_model_serializers bundler install failure
 RUN locale-gen en_US.UTF-8
@@ -39,33 +34,47 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-# install canvas
-RUN cd /opt \
-    && git clone https://github.com/instructure/canvas-lms.git \
-    && cd /opt/canvas-lms \
-    && bundle install --path vendor/bundle --without="mysql"
+RUN groupadd -r canvasuser -g 433 && \
+    adduser --uid 431 --system --gid 433 --home /opt/canvas --shell /sbin/nologin canvasuser && \
+    adduser canvasuser sudo && \
+    echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+RUN cd /opt/canvas \
+    && git clone https://github.com/instructure/canvas-lms.git
+
+COPY assets/database.yml /opt/canvas/canvas-lms/config/database.yml
+COPY assets/redis.yml /opt/canvas/canvas-lms/config/redis.yml
+COPY assets/cache_store.yml /opt/canvas/canvas-lms/config/cache_store.yml
+COPY assets/development-local.rb /opt/canvas/canvas-lms/config/environments/development-local.rb
+COPY assets/outgoing_mail.yml /opt/canvas/canvas-lms/config/outgoing_mail.yml
+COPY assets/supervisord.conf /etc/supervisor/supervisord.conf
+
+COPY assets/dbinit.sh /opt/canvas/dbinit.sh
+COPY assets/pg_hba.conf /etc/postgresql/9.3/main/pg_hba.conf
+RUN sed -i "/^#listen_addresses/i listen_addresses='*'" /etc/postgresql/9.3/main/postgresql.conf
+COPY assets/start.sh /opt/canvas/start.sh
+
+RUN chmod 755 /opt/canvas/*.sh
+RUN chown -R canvasuser: /opt/canvas
+
+WORKDIR /opt/canvas/canvas-lms
+USER canvasuser
+
+RUN bundle install --path vendor/bundle --without="mysql"
 
 # config setup
-RUN cd /opt/canvas-lms \
-    && for config in amazon_s3 delayed_jobs domain file_store outgoing_mail security external_migration \
+RUN for config in amazon_s3 delayed_jobs domain file_store security external_migration \
        ; do cp config/$config.yml.example config/$config.yml \
        ; done
 
-RUN cd /opt/canvas-lms \
-    && npm install --unsafe-perm \
-    && bundle exec rake canvas:compile_assets
+RUN mkdir -p log tmp/pids public/assets public/stylesheets/compiled \
+    && touch Gemmfile.lock
 
-COPY assets/database.yml /opt/canvas-lms/config/database.yml
-COPY assets/redis.yml /opt/canvas-lms/config/redis.yml
-COPY assets/cache_store.yml /opt/canvas-lms/config/cache_store.yml
-COPY assets/development-local.rb /opt/canvas-lms/config/environments/development-local.rb
-COPY assets/outgoing_mail.yml /opt/canvas-lms/config/outgoing_mail.yml
-COPY assets/supervisord.conf /etc/supervisor/supervisord.conf
-COPY assets/dbinit.sh /dbinit.sh
-COPY assets/dbconf.sh /dbconf.sh
-RUN chmod 755 /dbconf.sh /dbinit.sh
+RUN npm install \
+    && bundle exec rake canvas:compile_assets \
+    && sudo npm install -g coffee-script@1.6.2
 
-RUN /dbconf.sh && service postgresql start && /dbinit.sh
+RUN sudo service postgresql start && /opt/canvas/dbinit.sh
 
 # postgres
 EXPOSE 5432
@@ -74,6 +83,5 @@ EXPOSE 6379
 # canvas
 EXPOSE 3000
 
-COPY assets/start.sh /start.sh
-
-CMD ["/start.sh"]
+USER root
+CMD ["/opt/canvas/start.sh"]
