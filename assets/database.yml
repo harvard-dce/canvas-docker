@@ -18,3 +18,10 @@ development:
   queue:
     <<: *login
     database: canvas_queue_development
+
+production:
+  <<: *login
+  database: canvas_production
+  queue:
+    <<: *login
+    database: canvas_queue_production
