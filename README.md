@@ -8,16 +8,18 @@
 
 * [docker](https://www.docker.com/) (developed & tested w/ v1.5.0)
 
+## Running
+
+`docker run --name canvas-docker -p 3000:3000 -d lbjay/canvas-docker`
+
+This repo is [registered](https://registry.hub.docker.com/u/lbjay/canvas-docker/) at Docker Hub as an automated build. So you should also be able to `docker pull lbjay/canvas-docker` to get the pre-built image.
+
 ## Building
 
 1. Clone this repo somewhere. 
 2. Build the image: `docker build -t canvas-docker .`
 3. Start the container: `docker run -t -i -p 3000:3000 --name canvas-docker canvas-docker`
 4. Point your browser to [http://localhost:3000](http://localhost:3000). The admin user/pass login is `canvas@example.edu` / `canvas`.
-
-## Docker Hub image
-
-This repo is [registered](https://registry.hub.docker.com/u/lbjay/canvas-docker/) at Docker Hub as an automated build. So you should also be able to `docker pull lbjay/canvas-docker` to get the pre-built image.
 
 ## The "fat" container
 
@@ -35,6 +37,25 @@ API requests should be possible, e.g.,
 `curl -H "Authorization: Bearer canvas-docker" http://localhost:3000/api/v1/courses`
 
 The developer key is for use with Canvas's [OAuth2 Token Request Flow](https://canvas.instructure.com/doc/api/file.oauth.html)
+
+## Outgoing Email
+
+By default the instance's outgoing email `delivery_method` will be set to "test", meaning outgoing emails, such as user registration messages, will be 
+sent to the container's stdout. 
+
+To configure 'smtp' delivery set the following $ENV values at runtime:
+
+* **EMAIL_DELIVERY_METHOD** (set this to "smtp")
+* **SMTP_ADDRESS**
+* **SMTP_PORT**
+* **SMTP_USER**
+* **SMTP_PASS**
+
+Example using [Mandrill](https://mandrillapp.com/):
+
+```
+docker run -d --name=canvas -p 3000:3000 -e EMAIL_DELIVERY_METHOD=smtp -e SMTP_ADDRESS=smtp.mandrillapp.com -e SMTP_PORT=587 -e SMTP_USER=<mandrill_user> -e SMTP_PASS=<mandrill_api_key> lbjay/canvas-docker
+```
 
 ## Details
 

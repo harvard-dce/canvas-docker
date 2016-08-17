@@ -12,11 +12,11 @@ export CANVAS_LMS_ADMIN_PASSWORD="canvas"
 export CANVAS_LMS_ACCOUNT_NAME="Canvas Docker"
 export CANVAS_LMS_STATS_COLLECTION="opt_out"
 
-cd /opt/canvas-lms \
+cd /opt/canvas/canvas-lms \
     && bundle exec rake db:initial_setup
 
-psql -U canvas -d canvas_development -c "INSERT INTO developer_keys (api_key, email, name, redirect_uri, tool_id) VALUES ('test_developer_key', 'canvas@example.edu', 'DCE Course Admin', 'http://localhost:8000', 'canvas-docker');"
+psql -U canvas -d canvas_$RAILS_ENV -c "INSERT INTO developer_keys (api_key, email, name, redirect_uri, tool_id) VALUES ('test_developer_key', 'canvas@example.edu', 'DCE Course Admin', 'http://localhost:8000', 'canvas-docker');"
 
 # 'crypted_token' value is hmac sha1 of 'canvas-docker' using default config/security.yml encryption_key value as secret
-psql -U canvas -d canvas_development -c "INSERT INTO access_tokens (created_at, crypted_token, developer_key_id, purpose, token_hint, updated_at, user_id) VALUES ('2015-07-01 19:33:37.596812', '4bb5b288bb301d3d4a691ebff686fc67ad49daa8', 1, 'canvas-docker', '', '2015-07-01 19:33:37.596812', 1);"
+psql -U canvas -d canvas_$RAILS_ENV -c "INSERT INTO access_tokens (created_at, crypted_token, developer_key_id, purpose, token_hint, updated_at, user_id) VALUES ('2015-07-01 19:33:37.596812', '4bb5b288bb301d3d4a691ebff686fc67ad49daa8', 1, 'canvas-docker', '', '2015-07-01 19:33:37.596812', 1);"
 
