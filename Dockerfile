@@ -77,19 +77,9 @@ RUN for config in amazon_s3 delayed_jobs domain file_store security external_mig
 RUN mkdir -p log tmp/pids public/assets public/stylesheets/compiled \
     && touch Gemmfile.lock
 
-COPY assets/database.yml /opt/canvas-lms/config/database.yml
-COPY assets/redis.yml /opt/canvas-lms/config/redis.yml
-COPY assets/outgoing_mail.yml /opt/canvas-lms/config/outgoing_mail.yml
-COPY assets/cache_store.yml /opt/canvas-lms/config/cache_store.yml
-COPY assets/development-local.rb /opt/canvas-lms/config/environments/development-local.rb
-COPY assets/supervisord.conf /etc/supervisor/supervisord.conf
-COPY assets/dbinit.sh /dbinit.sh
-COPY assets/dbconf.sh /dbconf.sh
-RUN chmod 755 /dbconf.sh /dbinit.sh
-
-RUN npm install \
-    && bundle exec rake canvas:compile_assets \
-    && sudo npm install -g coffee-script@1.6.2
+RUN npm install
+RUN bundle exec rake canvas:compile_assets
+RUN sudo npm install -g coffee-script@1.6.2
 
 RUN sudo service postgresql start && /opt/canvas/dbinit.sh
 
