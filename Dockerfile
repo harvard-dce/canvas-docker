@@ -14,17 +14,24 @@ RUN apt-get update \
 RUN curl -sL https://deb.nodesource.com/setup_0.12 | bash
 
 # install deps for building/running canvas
+RUN echo "postfix postfix/mailname string localhost" |debconf-set-selections
+RUN echo "postfix postfix/main_mailer_type string 'Internet Site'" |debconf-set-selections
 RUN apt-get install -y \
     ruby2.1 ruby2.1-dev zlib1g-dev libxml2-dev libxslt1-dev \
     imagemagick libpq-dev libxmlsec1-dev libcurl4-gnutls-dev \
     libxmlsec1 build-essential openjdk-7-jre unzip curl \
     python g++ make git-core nodejs supervisor redis-server \
-    libpq5 libsqlite3-dev \
+    libpq5 libsqlite3-dev mailutils \
     postgresql-$POSTGRES_VERSION \
     postgresql-client-$POSTGRES_VERSION \
     postgresql-contrib-$POSTGRES_VERSION \
+    && echo 'myhostname = localhost' >> /etc/postfix/main.cf \
     && apt-get clean \
     && rm -Rf /var/cache/apt
+
+# work around for AUFS bug
+# as per https://github.com/docker/docker/issues/783#issuecomment-56013588
+RUN mkdir /etc/ssl/private-copy; mv /etc/ssl/private/* /etc/ssl/private-copy/; rm -r /etc/ssl/private; mv /etc/ssl/private-copy /etc/ssl/private; chmod -R 0700 /etc/ssl/private; chown -R postgres /etc/ssl/private
 
 RUN gem install bundler --version 1.11.2
 
@@ -70,9 +77,9 @@ RUN for config in amazon_s3 delayed_jobs domain file_store security external_mig
 RUN mkdir -p log tmp/pids public/assets public/stylesheets/compiled \
     && touch Gemmfile.lock
 
-RUN npm install \
-    && bundle exec rake canvas:compile_assets \
-    && sudo npm install -g coffee-script@1.6.2
+RUN npm install
+RUN bundle exec rake canvas:compile_assets
+RUN sudo npm install -g coffee-script@1.6.2
 
 RUN sudo service postgresql start && /opt/canvas/dbinit.sh
 
