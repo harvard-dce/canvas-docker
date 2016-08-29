@@ -6,7 +6,7 @@
 
 ## Prerequisites
 
-* [docker](https://www.docker.com/) (developed & tested w/ v1.5.0)
+* [docker](https://www.docker.com/) (developed & tested w/ v1.12.1)
 
 ## Running
 
@@ -61,12 +61,11 @@ docker run -d --name=canvas -p 3000:3000 -e EMAIL_DELIVERY_METHOD=smtp -e SMTP_A
 
 * The resulting canvas image is built and run using `RAILS_ENV=development`. At some point I might try creating a separate "production" flavor, but, because docker doesn't allow the setting of build-time variables except in the `Dockerfile`, it would require a separate `Dockerfile`. Also, when I did try building with `RAILS_ENV=production`, the resulting instance had issues with routing errors to the compiled assets, and the `db:initial_setup` rake task threw lots of warnings about missing triggers (?). So that.
 * Everything is currently somewhat "opinionated" in that things that would be nice to have configurable are hard-coded, e.g., postgres and canvas usernames, postgres network settings, path to the postgres data, etc.
-* The `Dockerfile` process mostly follows Canvas's [Quick Start](https://github.com/instructure/canvas-lms/wiki/Quick-Start) guidelines with a few exeptions:
+* The `Dockerfile` build process mostly follows Canvas's [Quick Start](https://github.com/instructure/canvas-lms/wiki/Quick-Start) guidelines with a few exeptions:
     * as mentioned above, `RAILS_ENV=development`
     * redis is installed, configured and used
     * the `delated_job` background task is executed
     * postgres is configured to not require a password for local connections, or for connections originating within a network defined by Docker's default network bridge setup: 172.17.0.0/16.
-    * everything is executed as root. This is me being lazy and I hope to fix this by creating/using a `canvas` user at some point.
 
 ## Contributors
 
@@ -78,4 +77,4 @@ Apache 2.0
 
 ## Copyright
 
-2015 President and Fellows of Harvard College
+2016 President and Fellows of Harvard College
