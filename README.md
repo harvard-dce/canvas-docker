@@ -1,3 +1,6 @@
+[![](https://images.microbadger.com/badges/image/lbjay/canvas-docker.svg)](http://microbadger.com/images/lbjay/canvas-docker "Get your own image badge on microbadger.com")
+[![](https://images.microbadger.com/badges/version/lbjay/canvas-docker.svg)](http://microbadger.com/images/lbjay/canvas-docker "Get your own version badge on microbadger.com")
+
 # canvas-docker
 
 ## Overview
