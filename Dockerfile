@@ -8,14 +8,13 @@ ENV GEM_HOME /opt/canvas/.gems
 # add nodejs and recommended ruby repos
 RUN apt-get update \
     && apt-get -y install curl software-properties-common \
-    && add-apt-repository -y ppa:brightbox/ppa \
     && add-apt-repository -y ppa:brightbox/ruby-ng \
     && apt-get update \
     && apt-get install -y ruby2.1 ruby2.1-dev supervisor redis-server \
         zlib1g-dev libxml2-dev libxslt1-dev libsqlite3-dev postgresql \
         postgresql-contrib libpq-dev libxmlsec1-dev curl make g++ git
 
-RUN curl -sL https://deb.nodesource.com/setup_0.12 | bash \
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash \
     && apt-get install -y nodejs
 
 RUN apt-get clean && rm -Rf /var/cache/apt
