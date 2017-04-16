@@ -67,6 +67,7 @@ RUN mkdir -p log tmp/pids public/assets public/stylesheets/compiled \
 RUN sudo service postgresql start && /opt/canvas/dbinit.sh
 
 RUN chown -R canvasuser: /opt/canvas
+RUN chown -R canvasuser: /tmp/attachment_fu/
 
 # postgres
 EXPOSE 5432
