@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Docker Hub...
+      - docker login -p $DOCKER_PASS -u $DOCKER_USER
+      - export RELEASE_TAG=`echo $REVISION | sed 's/\//-/g'`
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image for $REVISION ...
+      - docker build -t lbjay/canvas-docker:$RELEASE_TAG --build-arg REVISION=$REVISION .
+      - if [ "$LATEST" ] ; then docker tag lbjay/canvas-docker:$RELEASE_TAG lbjay/canvas-docker:latest ; fi
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image for $REVISION...
+      - docker push lbjay/canvas-docker:$RELEASE_TAG
+      - if [ "$LATEST" ] ; then docker push lbjay/canvas-docker:latest ; fi
