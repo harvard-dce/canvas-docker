@@ -5,6 +5,7 @@ MAINTAINER Jay Luker <jay_luker@harvard.edu>
 ARG REVISION=master
 ENV RAILS_ENV development
 ENV GEM_HOME /opt/canvas/.gems
+ENV YARN_VERSION 0.27.5-1
 
 # add nodejs and recommended ruby repos
 RUN apt-get update \
@@ -13,10 +14,18 @@ RUN apt-get update \
     && apt-get update \
     && apt-get install -y ruby2.4 ruby2.4-dev supervisor redis-server \
         zlib1g-dev libxml2-dev libxslt1-dev libsqlite3-dev postgresql \
-        postgresql-contrib libpq-dev libxmlsec1-dev curl make g++ git
+        postgresql-contrib libpq-dev libxmlsec1-dev curl make g++ git \
+        unzip fontforge libicu-dev
 
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash \
-    && apt-get install -y nodejs
+    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+        nodejs \
+        yarn="$YARN_VERSION" \
+        unzip \
+        fontforge
 
 RUN apt-get clean && rm -Rf /var/cache/apt
 
@@ -31,7 +40,13 @@ RUN groupadd -r canvasuser -g 433 && \
     adduser canvasuser sudo && \
     echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
-RUN gem install bundler --version 1.14.6
+RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
+  && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
+  && gem install bundler --no-document -v 1.15.2 \
+  && gem update --system --no-document \
+  && chown -R canvasuser: $GEM_HOME
+
+#RUN gem install bundler --version 1.14.6
 
 COPY assets/dbinit.sh /opt/canvas/dbinit.sh
 COPY assets/start.sh /opt/canvas/start.sh
@@ -58,11 +73,9 @@ RUN for config in amazon_s3 delayed_jobs domain file_store security external_mig
        ; do cp config/$config.yml.example config/$config.yml \
        ; done
 
-RUN $GEM_HOME/bin/bundle install --without="mysql"
-
-RUN npm install --unsafe-perm \
-    && $GEM_HOME/bin/bundle exec rake canvas:compile_assets_dev \
-    && sudo npm install --unsafe-perm -g coffee-script@1.6.2
+RUN $GEM_HOME/bin/bundle install --jobs 8 --without="mysql"
+RUN yarn install --pure-lockfile
+RUN COMPILE_ASSETS_NPM_INSTALL=0 $GEM_HOME/bin/bundle exec rake canvas:compile_assets_dev
 
 RUN mkdir -p log tmp/pids public/assets public/stylesheets/compiled \
     && touch Gemmfile.lock
