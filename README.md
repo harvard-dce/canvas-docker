@@ -39,7 +39,8 @@ API requests should be possible, e.g.,
 
 `curl -H "Authorization: Bearer canvas-docker" http://localhost:3000/api/v1/courses`
 
-The developer key is for use with Canvas's [OAuth2 Token Request Flow](https://canvas.instructure.com/doc/api/file.oauth.html)
+The developer key is for use with Canvas's [OAuth2 Token Request Flow](https://canvas.instructure.com/doc/api/file.oauth.html). 
+For example, if you're making use of [harvard-dce/django-canvas-api-token](https://github.com/harvard-dce/django-canvas-api-token).
 
 ## Outgoing Email
 
