@@ -43,7 +43,6 @@ RUN groupadd -r canvasuser -g 433 && \
 RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
   && gem install bundler --no-document -v 1.15.2 \
-  && gem update --system --no-document \
   && chown -R canvasuser: $GEM_HOME
 
 #RUN gem install bundler --version 1.14.6
