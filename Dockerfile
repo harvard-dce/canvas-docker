@@ -27,6 +27,8 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash \
         unzip \
         fontforge
 
+RUN yarn config set workspaces-experimental true
+
 RUN apt-get clean && rm -Rf /var/cache/apt
 
 # Set the locale to avoid active_model_serializers bundler install failure
