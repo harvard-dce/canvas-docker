@@ -1,15 +1,21 @@
 #!/bin/bash
 set -e
 
-export POSTGRES_BIN=/usr/lib/postgresql/9.3/bin
+export POSTGRES_BIN=/usr/lib/postgresql/9.5/bin
 
-sudo -u postgres $POSTGRES_BIN/createuser --superuser canvas
-sudo -u postgres $POSTGRES_BIN/createdb -E UTF-8 -T template0 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8 --owner canvas canvas_$RAILS_ENV
-sudo -u postgres $POSTGRES_BIN/createdb -E UTF-8 -T template0 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8 --owner canvas canvas_queue_$RAILS_ENV
+echo 'startDB'
+echo $POSTGRES_BIN
 
-export CANVAS_LMS_ADMIN_EMAIL="canvas@example.edu"
-export CANVAS_LMS_ADMIN_PASSWORD="canvas-docker"
-export CANVAS_LMS_ACCOUNT_NAME="Canvas Docker"
+#sudo -u postgres $POSTGRES_BIN/createuser --superuser canvas
+#sudo -u postgres $POSTGRES_BIN/createdb -E UTF-8 -T template0 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8 --owner canvas canvas_$RAILS_ENV
+#sudo -u postgres $POSTGRES_BIN/createdb -E UTF-8 -T template0 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8 --owner canvas canvas_queue_$RAILS_ENV
+su postgres -c '$POSTGRES_BIN/createuser --superuser canvas'
+su postgres -c '$POSTGRES_BIN/createdb -E UTF-8 -T template0 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8 --owner canvas canvas_$RAILS_ENV'
+su postgres -c '$POSTGRES_BIN/createdb -E UTF-8 -T template0 --lc-collate=en_US.UTF-8 --lc-ctype=en_US.UTF-8 --owner canvas canvas_queue_$RAILS_ENV'
+
+export CANVAS_LMS_ADMIN_EMAIL="admin@patten.edu"
+export CANVAS_LMS_ADMIN_PASSWORD="admin123"
+export CANVAS_LMS_ACCOUNT_NAME="Patten University"
 export CANVAS_LMS_STATS_COLLECTION="opt_out"
 
 cd /opt/canvas/canvas-lms \
