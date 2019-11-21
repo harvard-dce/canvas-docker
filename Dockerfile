@@ -92,4 +92,4 @@ EXPOSE 6379
 # canvas
 EXPOSE 3000
 
-#CMD ["/opt/canvas/start.sh"]
+CMD ["/opt/canvas/start.sh"]
