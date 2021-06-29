@@ -1,29 +1,33 @@
-FROM ubuntu:14.04
+FROM ubuntu:20.04
 
 MAINTAINER Jay Luker <jay_luker@harvard.edu>
 
 ARG REVISION=master
 ENV RAILS_ENV development
 ENV GEM_HOME /opt/canvas/.gems
-ENV YARN_VERSION 0.27.5-1
+ENV DEBIAN_FRONTEND noninteractive
 
 # add nodejs and recommended ruby repos
 RUN apt-get update \
-    && apt-get -y install curl software-properties-common \
-    && add-apt-repository -y ppa:brightbox/ruby-ng \
-    && apt-get update \
-    && apt-get install -y ruby2.4 ruby2.4-dev supervisor redis-server \
+    && apt-get install -y ruby ruby-dev supervisor redis-server \
         zlib1g-dev libxml2-dev libxslt1-dev libsqlite3-dev postgresql \
         postgresql-contrib libpq-dev libxmlsec1-dev curl make g++ git \
-        unzip fontforge libicu-dev
+        unzip fontforge libicu-dev autoconf curl software-properties-common \
+        sudo
 
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash \
+RUN curl -sSL -o apache-pulsar-client-dev.deb https://archive.apache.org/dist/pulsar/pulsar-2.6.1/DEB/apache-pulsar-client-dev.deb \
+  && curl -sSL -o apache-pulsar-client.deb https://archive.apache.org/dist/pulsar/pulsar-2.6.1/DEB/apache-pulsar-client.deb \
+  && dpkg -i apache-pulsar-client.deb \
+  && dpkg -i apache-pulsar-client-dev.deb \
+  && rm apache-pulsar-client-dev.deb apache-pulsar-client.deb
+
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
         nodejs \
-        yarn="$YARN_VERSION" \
+        yarn \
         unzip \
         fontforge
 
@@ -41,8 +45,9 @@ RUN groupadd -r canvasuser -g 433 && \
     echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="-i /var/lib/gems/$RUBY_MAJOR.0"; fi \
+  && mkdir -p $GEM_HOME \
   && gem uninstall --all --ignore-dependencies --force $BUNDLER_INSTALL bundler \
-  && gem install bundler --no-document -v 1.15.2 \
+  && gem install bundler --no-document -v 2.2.19 \
   && chown -R canvasuser: $GEM_HOME
 
 #RUN gem install bundler --version 1.14.6
@@ -52,8 +57,8 @@ COPY assets/start.sh /opt/canvas/start.sh
 RUN chmod 755 /opt/canvas/*.sh
 
 COPY assets/supervisord.conf /etc/supervisor/supervisord.conf
-COPY assets/pg_hba.conf /etc/postgresql/9.3/main/pg_hba.conf
-RUN sed -i "/^#listen_addresses/i listen_addresses='*'" /etc/postgresql/9.3/main/postgresql.conf
+COPY assets/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf
+RUN sed -i "/^#listen_addresses/i listen_addresses='*'" /etc/postgresql/12/main/postgresql.conf
 
 RUN cd /opt/canvas \
     && git clone https://github.com/instructure/canvas-lms.git \
