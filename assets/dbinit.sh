@@ -13,7 +13,7 @@ export CANVAS_LMS_ACCOUNT_NAME="Canvas Docker"
 export CANVAS_LMS_STATS_COLLECTION="opt_out"
 
 cd /opt/canvas/canvas-lms \
-    && $GEM_HOME/bin/bundle exec rake db:initial_setup
+    && /opt/canvas/.gem/ruby/2.7.0/bin/bundle _2.2.19_ exec rake db:initial_setup
 
 psql -U canvas -d canvas_development -c "INSERT INTO developer_keys (api_key, email, name, redirect_uri, root_account_id) VALUES ('test_developer_key', 'canvas@example.edu', 'Canvas Docker', 'http://localhost:8000', 1);"
 
