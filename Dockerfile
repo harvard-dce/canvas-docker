@@ -14,7 +14,8 @@ RUN apt-get update \
         zlib1g-dev libxml2-dev libxslt1-dev libsqlite3-dev postgresql \
         postgresql-contrib libpq-dev libxmlsec1-dev curl make g++ git \
         unzip fontforge libicu-dev autoconf curl software-properties-common \
-        sudo
+        sudo \
+    && apt-get clean && rm -Rf /var/cache/apt
 
 RUN curl -sSL -o apache-pulsar-client-dev.deb https://archive.apache.org/dist/pulsar/pulsar-2.6.1/DEB/apache-pulsar-client-dev.deb \
   && curl -sSL -o apache-pulsar-client.deb https://archive.apache.org/dist/pulsar/pulsar-2.6.1/DEB/apache-pulsar-client.deb \
@@ -30,9 +31,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
         nodejs \
         yarn \
         unzip \
-        fontforge
-
-RUN apt-get clean && rm -Rf /var/cache/apt
+        fontforge \
+    && apt-get clean && rm -Rf /var/cache/apt
 
 # Set the locale to avoid active_model_serializers bundler install failure
 RUN locale-gen en_US.UTF-8
@@ -57,9 +57,7 @@ COPY assets/pg_hba.conf /etc/postgresql/12/main/pg_hba.conf
 RUN sed -i "/^#listen_addresses/i listen_addresses='*'" /etc/postgresql/12/main/postgresql.conf
 
 RUN cd /opt/canvas \
-    && sudo -u canvasuser git clone https://github.com/instructure/canvas-lms.git \
-    && cd canvas-lms \
-    && sudo -u canvasuser git checkout $REVISION
+    && sudo -u canvasuser git clone https://github.com/instructure/canvas-lms.git --branch $REVISION --single-branch
 
 WORKDIR /opt/canvas/canvas-lms
 
@@ -73,12 +71,15 @@ RUN for config in amazon_s3 delayed_jobs domain file_store security external_mig
        ; do cp config/$config.yml.example config/$config.yml \
        ; done
 
-RUN sudo -u canvasuser /opt/canvas/.gem/ruby/2.7.0/bin/bundle _2.2.19_ install --jobs 8 --without="mysql"
-RUN sudo -u canvasuser yarn install --pure-lockfile
+RUN sudo -u canvasuser /opt/canvas/.gem/ruby/2.7.0/bin/bundle config set --local without 'development:test' \
+  &&sudo -u canvasuser /opt/canvas/.gem/ruby/2.7.0/bin/bundle config set --local without 'mysql' \
+  && sudo -u canvasuser /opt/canvas/.gem/ruby/2.7.0/bin/bundle _2.2.19_ install --jobs 8
+
+RUN sudo -u canvasuser yarn install --pure-lockfile && sudo -u canvasuser yarn cache clean
 RUN sudo -u canvasuser COMPILE_ASSETS_NPM_INSTALL=0 /opt/canvas/.gem/ruby/2.7.0/bin/bundle _2.2.19_ exec rake canvas:compile_assets_dev
 
 RUN sudo -u canvasuser mkdir -p log tmp/pids public/assets public/stylesheets/compiled \
-    && sudo -u canvasuser touch Gemmfile.lock
+    && sudo -u canvasuser touch Gemfile.lock
 
 RUN service postgresql start && sudo -u canvasuser /opt/canvas/dbinit.sh
 
