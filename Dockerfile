@@ -66,6 +66,7 @@ COPY --chown=canvasuser assets/redis.yml config/redis.yml
 COPY --chown=canvasuser assets/cache_store.yml config/cache_store.yml
 COPY --chown=canvasuser assets/development-local.rb config/environments/development-local.rb
 COPY --chown=canvasuser assets/outgoing_mail.yml config/outgoing_mail.yml
+COPY assets/healthcheck.sh /usr/local/bin/healthcheck.sh
 
 RUN for config in amazon_s3 delayed_jobs domain file_store security external_migration \
        ; do cp config/$config.yml.example config/$config.yml \
@@ -91,5 +92,8 @@ EXPOSE 5432
 EXPOSE 6379
 # canvas
 EXPOSE 3000
+
+HEALTHCHECK --interval=3m --start-period=5m \
+   CMD /usr/local/bin/healthcheck.sh
 
 CMD ["/opt/canvas/start.sh"]
