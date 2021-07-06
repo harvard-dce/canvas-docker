@@ -13,7 +13,11 @@
 
 ## Running
 
-`docker run --name canvas-docker -p 3000:3000 -d lbjay/canvas-docker`
+**NOTE** The rails server will send a `500` error for the landing page when started for the first time. This can be resolved by restarting the container after it is fully initialized.
+
+    docker run --name canvas-docker -p 3000:3000 -d lbjay/canvas-docker
+    # Wait for the services to finish starting up then press ctrl-c to stop the container
+    docker start canvas-docker
 
 This repo is [registered](https://registry.hub.docker.com/u/lbjay/canvas-docker/) at Docker Hub as an automated build. So you should also be able to `docker pull lbjay/canvas-docker` to get the pre-built image.
 
@@ -22,7 +26,8 @@ This repo is [registered](https://registry.hub.docker.com/u/lbjay/canvas-docker/
 1. Clone this repo somewhere. 
 2. Build the image: `docker build -t canvas-docker .`
 3. Start the container: `docker run -t -i -p 3000:3000 --name canvas-docker canvas-docker`
-4. Point your browser to [http://localhost:3000](http://localhost:3000). The admin user/pass login is `canvas@example.edu` / `canvas-docker`.
+4. Wait for the services to finish starting up then press `ctrl-c` to stop the container and run `docker start canvas-docker`
+5. Point your browser to [http://localhost:3000](http://localhost:3000). The admin user/pass login is `canvas@example.edu` / `canvas-docker`.
 
 ## The "fat" container
 
