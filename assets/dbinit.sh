@@ -15,7 +15,9 @@ export CANVAS_LMS_STATS_COLLECTION="opt_out"
 cd /opt/canvas/canvas-lms \
     && /opt/canvas/.gem/ruby/2.7.0/bin/bundle _2.2.19_ exec rake db:initial_setup
 
-psql -U canvas -d canvas_development -c "INSERT INTO developer_keys (api_key, email, name, redirect_uri, root_account_id) VALUES ('test_developer_key', 'canvas@example.edu', 'Canvas Docker', 'http://localhost:8000', 1);"
+psql -U canvas -d canvas_development -c "INSERT INTO developer_keys (api_key, email, name, redirect_uri, root_account_id, access_token_count) VALUES ('test_developer_key', 'canvas@example.edu', 'Canvas Docker', 'http://localhost:8000', 1, 1);"
 
 # 'crypted_token' value is hmac sha1 of 'canvas-docker' using default config/security.yml encryption_key value as secret
-psql -U canvas -d canvas_development -c "INSERT INTO access_tokens (created_at, crypted_token, developer_key_id, purpose, token_hint, updated_at, user_id, root_account_id) SELECT now(), '4bb5b288bb301d3d4a691ebff686fc67ad49daa8', dk.id, 'canvas-docker', '', now(), 1, 1 FROM developer_keys dk where dk.email = 'canvas@example.edu';"
+psql -U canvas -d canvas_development -c "INSERT INTO access_tokens (created_at, crypted_token, developer_key_id, purpose, token_hint, updated_at, user_id, root_account_id) SELECT now(), '4bb5b288bb301d3d4a691ebff686fc67ad49daa8', dk.id, 'canvas-docker', 'canva', now(), 1, 1 FROM developer_keys dk where dk.email = 'canvas@example.edu';"
+
+psql -U canvas -d canvas_development -c "INSERT INTO developer_key_account_bindings (account_id, developer_key_id, workflow_state, created_at, root_account_id) SELECT 1, dk.id, 'on', now(), 1 FROM developer_keys dk where dk.email = 'canvas@example.edu';"
